@@ -2,6 +2,7 @@ const express = require('express');
 var cors = require('cors')
 require('dotenv').config()
 const { MongoClient, ServerApiVersion } = require('mongodb');
+var ObjectId = require('mongodb').ObjectId;
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -28,6 +29,8 @@ async function run() {
         console.log('database connected');
 
         const productCollection = client.db("manufacturer-website").collection("products")
+        const purchaseCollection = client.db("manufacturer-website").collection("purchase")
+
 
         app.get('/products', async (req, res) => {
 
@@ -35,6 +38,25 @@ async function run() {
             const cursor = productCollection.find(query);
             const services = await cursor.toArray()
             res.send(services)
+
+        })
+
+        app.get('/products/:id', async (req, res) => {
+            // console.log(req.params.id)
+            // res.send(req.params.id)
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+            console.log(query);
+            const result = await productCollection.findOne(query)
+
+            res.send(result)
+        })
+
+        app.post('/purchase', async (req, res) => {
+
+            const orderData = req.body
+            const result = await purchaseCollection.insertOne(orderData)
+            res.send(result)
 
         })
 
@@ -52,9 +74,6 @@ async function run() {
 run().catch(console.dir);
 
 
-app.get('/', (req, res) => {
-    res.send('hey there!hlwwww')
-})
 
 app.listen(port, () => {
     console.log('listning to port', port);

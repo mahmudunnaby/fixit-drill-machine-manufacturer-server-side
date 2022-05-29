@@ -72,11 +72,11 @@ async function run() {
             const userData = req.body
 
             const filter = { email: email }
-
+            const options = { upsert: true }
             const updateDoc = {
                 $set: { userData },
             }
-            const result = await userCollection.updateOne(filter, updateDoc)
+            const result = await userCollection.updateOne(filter, updateDoc, options)
             res.send(result)
         })
 

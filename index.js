@@ -31,6 +31,7 @@ async function run() {
         const productCollection = client.db("manufacturer-website").collection("products")
         const purchaseCollection = client.db("manufacturer-website").collection("purchase")
         const reviewCollection = client.db("manufacturer-website").collection("review")
+        const userCollection = client.db("manufacturer-website").collection("users")
 
 
         app.get('/products', async (req, res) => {
@@ -59,12 +60,77 @@ async function run() {
             const reviews = await cursor.toArray()
             res.send(reviews)
         })
+        app.get('/user', async (req, res) => {
+
+            const query = {}
+            const cursor = userCollection.find(query);
+            const users = await cursor.toArray()
+            res.send(users)
+        })
 
         app.post('/purchase', async (req, res) => {
 
             const orderData = req.body
             const result = await purchaseCollection.insertOne(orderData)
             res.send(result)
+
+        })
+
+
+        app.put('/user/admin/:email', async (req, res) => {
+            const email = req.params.email
+
+            const filter = { email: email }
+            const updateDoc = {
+                $set: { role: 'admin' },
+            }
+            const result = await userCollection.updateOne(filter, updateDoc)
+            res.send(result)
+
+
+
+
+        })
+        app.get('/admin/:email', async (req, res) => {
+            const email = req.params.email
+
+            const user = await userCollection.findOne({ email: email })
+            const isAdmin = user.role === 'admin'
+            res.send({ admin: isAdmin })
+
+
+
+
+        })
+
+        app.put('/user/:email', async (req, res) => {
+            const email = req.params.email
+            const user = req.body
+            const filter = { email: email }
+            const options = { upsert: true }
+            const updateDoc = {
+                $set: user,
+            }
+            const result = await userCollection.updateOne(filter, updateDoc, options)
+            res.send(result)
+
+        })
+
+        app.get('/purchase', async (req, res) => {
+
+
+            const query = {}
+            const cursor = purchaseCollection.find(query);
+            const allPurchase = await cursor.toArray()
+            res.send(allPurchase)
+
+        })
+        app.get('/purchase/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { email: id }
+            const cursor = purchaseCollection.find(query);
+            const purchases = await cursor.toArray()
+            res.send(purchases)
 
         })
         app.post('/review', async (req, res) => {

@@ -30,6 +30,7 @@ async function run() {
 
         const productCollection = client.db("manufacturer-website").collection("products")
         const purchaseCollection = client.db("manufacturer-website").collection("purchase")
+        const reviewCollection = client.db("manufacturer-website").collection("review")
 
 
         app.get('/products', async (req, res) => {
@@ -51,6 +52,13 @@ async function run() {
 
             res.send(result)
         })
+        app.get('/review', async (req, res) => {
+
+            const query = {}
+            const cursor = reviewCollection.find(query);
+            const reviews = await cursor.toArray()
+            res.send(reviews)
+        })
 
         app.post('/purchase', async (req, res) => {
 
@@ -59,6 +67,14 @@ async function run() {
             res.send(result)
 
         })
+        app.post('/review', async (req, res) => {
+
+            const reviewData = req.body
+            const result = await reviewCollection.insertOne(reviewData)
+            res.send(result)
+
+        })
+
 
 
 

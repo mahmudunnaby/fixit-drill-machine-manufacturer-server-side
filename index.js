@@ -67,6 +67,19 @@ async function run() {
             const users = await cursor.toArray()
             res.send(users)
         })
+        app.put('/user/:email', async (req, res) => {
+            const email = req.params.email
+            const userData = req.body
+
+            const filter = { email: email }
+
+            const updateDoc = {
+                $set: { userData },
+            }
+            const result = await userCollection.updateOne(filter, updateDoc)
+            res.send(result)
+        })
+
 
         app.post('/purchase', async (req, res) => {
 
@@ -93,11 +106,9 @@ async function run() {
             }
             const result = await userCollection.updateOne(filter, updateDoc)
             res.send(result)
-
-
-
-
         })
+
+
         app.get('/admin/:email', async (req, res) => {
             const email = req.params.email
 
